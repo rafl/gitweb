@@ -1,6 +1,7 @@
 <%args>
 $project
 $revs
+$heads
 </%args>
 
 <%def .rev_link>
@@ -24,3 +25,14 @@ $action
 <& /project/shortlog, revs => $revs &>
 
 <h2>heads</h2>
+
+<table>
+% for my $head (@{$heads}) {
+	<tr>
+		<td><& /common/format_last_change, time => $head->{last_change} &></td>
+		<td><% $head->{name} %></td>
+		<td><& /common/rev_link, rev => $head->{rev}, action => 'shortlog' &></td>
+		<td><& /common/rev_link, rev => $head->{rev}, action => 'log'      &></td>
+	</tr>
+% }
+</table>

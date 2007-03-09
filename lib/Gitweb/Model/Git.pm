@@ -304,6 +304,30 @@ sub rev_info {
     return $self->list_revs($project, rev => $rev, count => 1);
 }
 
+sub get_heads {
+    my ($self, $project) = @_;
+
+    my $output = $self->run_cmd_in($project, qw/for-each-ref --sort=-committerdate /, '--format=%(objectname)%00%(refname)%00%(committer)', 'refs/heads');
+    return unless $output;
+
+    my @ret;
+    for my $line (split /\n/, $output) {
+        my ($rev, $head, $commiter) = split /\0/, $line, 3;
+        $head =~ s!^refs/heads/!!;
+
+        push @ret, { rev => $rev, name => $head };
+
+        #FIXME: That isn't the time I'm looking for..
+        if (my ($epoch, $tz) = $output =~ /\s(\d+)\s+([+-]\d+)$/) {
+            my $dt = DateTime->from_epoch(epoch => $epoch);
+            $dt->set_time_zone($tz);
+            $ret[-1]->{last_change} = $dt;
+        }
+    }
+
+    return \@ret;
+}
+
 sub archive {
     my ($self, $project, $rev) = @_;
 

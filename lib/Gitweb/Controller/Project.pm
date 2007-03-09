@@ -38,6 +38,7 @@ sub summary : Chained('project') Args(0) {
     my $git = $c->model('Git');
 
     my $project : Stashed = $git->project_info($project_name);
+    my $heads   : Stashed = $git->get_heads($project_name);
     my $revs    : Stashed = $c->model('Git')->list_revs($project_name,
             skip  => $page * $count,
             count => $count,
