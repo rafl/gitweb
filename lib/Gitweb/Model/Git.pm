@@ -60,13 +60,12 @@ sub get_project_properties {
 
     eval {
         $props{description} = $dir->file('description')->slurp;
+        chomp $props{description};
     };
 
     if ($props{description} =~ /^Unnamed repository;/) {
         delete $props{description};
     }
-    chomp $props{description};
-
 
     $props{owner} = (getpwuid $dir->stat->uid)[6];
 
