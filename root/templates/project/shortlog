@@ -2,7 +2,25 @@
 $revs
 </%args>
 
+<%def .shortlog_nav>
+% my $page = $c->stash->{page};
+<ul>
+<li><a href="<% $c->request->uri_with({ page => 0 }) %>">HEAD</a></li>
+<li>
+% if ($page > 0) {
+<a href="<% $c->request->uri_with({ page => $page - 1 }) %>">
+% }
+prev
+% if ($page > 0) {
+</a>
+% }
+</li>
+<li><a href="<% $c->request->uri_with({ page => $page + 1 }) %>">next</a></li>
+</ul>
+</%def>
+
 % if (scalar @{$revs}) {
+<& .shortlog_nav &>
 <table>
 % 	for my $rev (@{$revs}) {
 	<tr>
@@ -15,4 +33,5 @@ $revs
 	</tr>
 % 	}
 </table>
+<& .shortlog_nav &>
 % }

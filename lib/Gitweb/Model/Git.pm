@@ -278,12 +278,13 @@ sub diff {
 sub list_revs {
     my ($self, $project, %args) = @_;
 
+    Data::Dump::dump(\@_);
     $args{rev} ||= $self->get_head_hash($project);
 
     my $output = $self->run_cmd_in($project, 'rev-list',
             '--header',
-            (defined $args{ max  } ? "--max-count=$args{max}" : ()),
-            (defined $args{ skip } ? "--skip=$args{skip}"     : ()),
+            (defined $args{ count } ? "--max-count=$args{count}" : ()),
+            (defined $args{ skip  } ? "--skip=$args{skip}"     : ()),
             $args{rev},
             '--',
             ($args{file} || ())
@@ -300,7 +301,7 @@ sub rev_info {
 
     return unless $self->valid_rev($rev);
 
-    return $self->list_revs($project, rev => $rev, max => 1);
+    return $self->list_revs($project, rev => $rev, count => 1);
 }
 
 1;

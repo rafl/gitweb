@@ -2,6 +2,7 @@ package Gitweb::Controller::Project;
 
 use strict;
 use warnings;
+use Data::Page;
 use base 'Catalyst::Controller::BindLex';
 
 =head1 NAME
@@ -31,24 +32,42 @@ sub summary : Chained('project') Args(0) {
     my ($self, $c) = @_;
     my $project_name : Stashed;
 
+    my $page  : Stashed = $c->request->param( 'page'  ) || 0;
+    my $count : Stashed = $c->request->param( 'count' ) || 30;
+
     my $git = $c->model('Git');
 
     my $project : Stashed = $git->project_info($project_name);
-    my $revs    : Stashed = $git->list_revs($project_name);
+    my $revs    : Stashed = $c->model('Git')->list_revs($project_name,
+            skip  => $page * $count,
+            count => $count,
+    );
 }
 
 sub shortlog : Chained('project') Args(0) {
     my ($self, $c) = @_;
     my $project_name : Stashed;
 
-    my $revs : Stashed = $c->model('Git')->list_revs($project_name);
+    my $page  : Stashed = $c->request->param( 'page'  ) || 0;
+    my $count : Stashed = $c->request->param( 'count' ) || 30;
+
+    my $revs : Stashed = $c->model('Git')->list_revs($project_name,
+            skip  => $page * $count,
+            count => $count,
+    );
 }
 
 sub log : Chained('project') Args(0) {
     my ($self, $c) = @_;
     my $project_name : Stashed;
 
-    my $revs : Stashed = $c->model('Git')->list_revs($project_name);
+    my $page  : Stashed = $c->request->param( 'page'  ) || 0;
+    my $count : Stashed = $c->request->param( 'count' ) || 30;
+
+    my $revs : Stashed = $c->model('Git')->list_revs($project_name,
+            skip  => $page * $count,
+            count => $count,
+    );
 }
 
 sub snapshot : Chained('project') Args(0) {
