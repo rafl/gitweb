@@ -4,13 +4,14 @@ $time
 
 <%once>
 use DateTime;
+use Scalar::Util qw/blessed/;
 use Lingua::EN::Inflect qw/PL/;
 
 my @units = qw/years months weeks days hours minutes seconds nanoseconds/;
 my %css_class_for_unit = map { $_ => "age_$_" } @units;
 </%once>
 
-% if ($time) {
+% if (blessed $time && $time->isa('DateTime')) {
 % 	my $now = DateTime->now;
 % 	my $dur = $time - $now;
 %
@@ -21,4 +22,6 @@ my %css_class_for_unit = map { $_ => "age_$_" } @units;
 % 			last;
 % 		}
 % 	}
+% } else {
+<% $time %>
 % }
