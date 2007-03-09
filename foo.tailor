@@ -1,0 +1,16 @@
+[DEFAULT]
+verbose = True
+
+[project]
+target = git:target
+start-revision = INITIAL
+root-directory = /tmp/tailor
+state-file = tailor.state
+source = darcs:source
+subdir = .
+
+[darcs:source]
+repository = /home/rafl/projects/perl/Gitweb-newdarcs
+
+[git:target]
+

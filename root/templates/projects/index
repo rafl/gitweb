@@ -1,0 +1,63 @@
+<%args>
+$projects
+</%args>
+
+<%once>
+use DateTime;
+use Lingua::EN::Inflect qw/PL/;
+
+my @units = qw/years months weeks days hours minutes seconds nanoseconds/;
+my %css_class_for_unit = map { $_ => "age_$_" } @units;
+</%once>
+
+% my $now = DateTime->now;
+
+<%def .format_last_change>
+<%args>
+$time
+</%args>
+% if ($time) {
+% 	my $now = DateTime->now;
+% 	my $dur = $time - $now;
+
+% 	for my $unit (@units) {
+% 		if ($dur->$unit) {
+% 			(my $sing = $unit) =~ s/s$//;
+<span class="<% $css_class_for_unit{$unit} %>"><% $dur->$unit %> <% PL($sing, $dur->$unit) %> ago</span>
+% 			last;
+% 		}
+% 	}
+% }
+</%def>
+
+<%def .project_link>
+<%args>
+$project
+$action
+$desc => $action
+</%args>
+<a href="<% $c->uri_for('/project', $project, $action) %>"><% $desc %></a>
+</%def>
+
+% if (scalar @{$projects}) {
+<table>
+<tr>
+	<th>Project</th>
+	<th>Description</th>
+	<th>Owner</th>
+	<th>Last Change</th>
+</tr>
+% 	for my $project (@{ $projects }) {
+<tr>
+	<td><& .project_link, project => $project->{name}, action => 'summary', desc => $project->{name} &></td>
+	<td><% $project->{ description } %></td>
+	<td><% $project->{ owner       } %></td>
+	<td><& .format_last_change, time => $project->{ last_change } &></td>
+	<td><& .project_link, project => $project->{name}, action => 'summary'  &></td>
+	<td><& .project_link, project => $project->{name}, action => 'shortlog' &></td>
+	<td><& .project_link, project => $project->{name}, action => 'log'      &></td>
+	<td><& .project_link, project => $project->{name}, action => 'snapshot', desc => 'latest snapshot' &></td>
+</tr>
+% 	}
+</table>
+% }

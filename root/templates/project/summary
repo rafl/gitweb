@@ -1,0 +1,45 @@
+<%args>
+$project
+$revs
+</%args>
+
+<%def .rev_link>
+<%args>
+$project
+$rev
+$action
+</%args>
+<a href="<% $c->uri_for('/project', $project, 'rev', $rev, $action) %>"><% $action %></a>
+</%def>
+
+<h1>projects / <% $project->{name} %> / <% $c->action->name %></h1>
+
+<dl>
+% for my $prop (qw/description owner last_change/) { #TODO: url
+	<dt><% $prop %></dt>
+	<dd><% $project->{$prop} || 'none' %></dd>
+% }
+</dl>
+
+<h2>shortlog</h2>
+
+% if (scalar @{$revs}) {
+<table>
+% 	for my $rev (@{$revs}) {
+	<tr>
+		<td><% $rev->{author_datetime} %></td>
+		<td><% $rev->{author_name} || $rev->{author} %></td>
+		<td><% $rev->{message} %></td>
+		<td><& .rev_link, project => $project->{name}, rev => $rev->{rev}, action => 'commit'     &></td>
+		<td><& .rev_link, project => $project->{name}, rev => $rev->{rev}, action => 'commitdiff' &></td>
+		<td><& .rev_link, project => $project->{name}, rev => $rev->{rev}, action => 'snapshot'   &></td>
+	</tr>
+% 	}
+</table>
+% }
+
+<pre>
+<% Data::Dump::dump($revs) %>
+</pre>
+
+<h2>heads</h2>
