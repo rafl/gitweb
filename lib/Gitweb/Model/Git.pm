@@ -304,4 +304,12 @@ sub rev_info {
     return $self->list_revs($project, rev => $rev, count => 1);
 }
 
+sub archive {
+    my ($self, $project, $rev) = @_;
+
+    #FIXME: huge memory consuption
+    #TODO: compression
+    return $self->run_cmd_in($project, qw/archive --format=tar/, "--prefix=${project}/", $rev);
+}
+
 1;

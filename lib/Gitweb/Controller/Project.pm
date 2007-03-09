@@ -73,6 +73,9 @@ sub log : Chained('project') Args(0) {
 sub snapshot : Chained('project') Args(0) {
     my ($self, $c) = @_;
     my $project_name : Stashed;
+
+    my $rev : Stashed = $c->model('Git')->get_head_hash($project_name);
+    $c->detach('commit_snapshot');
 }
 
 sub rev : Chained('project') CaptureArgs(1) {
@@ -92,11 +95,18 @@ sub commit : Chained('rev') Args(0) {
 sub commitdiff : Chained('rev') Args(0) {
     my ($self, $c) = @_;
     my $rev : Stashed;
+
 }
 
 sub commit_snapshot : Chained('rev') PathPart('snapshot') Args(0) {
     my ($self, $c) = @_;
     my $rev : Stashed;
+    my $project_name : Stashed;
+
+    $c->response->header('Content-Type'        => 'application/x-tar');
+    $c->response->header('Content-Disposition' => "inline; filename=${project_name}_${rev}.tar");
+
+    $c->response->body( $c->model('Git')->archive($project_name, $rev) );
 }
 
 =head1 AUTHOR
