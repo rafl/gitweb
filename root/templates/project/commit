@@ -1,0 +1,25 @@
+<%args>
+$commit
+</%args>
+
+<dl>
+	<dt>author</dt>
+	<dd><% $commit->{author} %> <% $commit->{author_datetime} %></dd>
+
+	<dt>committer</dt>
+	<dd><% $commit->{committer} %> <% $commit->{committer_datetime} %></dd>
+
+	<dt>commit</dt>
+	<dd><% $commit->{rev} %></dd>
+
+	<dt>tree</dt>
+	<dd><% $commit->{tree} %></dd>
+
+	<dt>parent</dt>
+	<dd><% $commit->{parent} %></dd>
+
+	<dt>snapshot</dt>
+	<dd>TODO</dd>
+</dl>
+
+<pre><% Data::Dump::dump($commit) %></pre>

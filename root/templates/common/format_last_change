@@ -1,0 +1,24 @@
+<%args>
+$time
+</%args>
+
+<%once>
+use DateTime;
+use Lingua::EN::Inflect qw/PL/;
+
+my @units = qw/years months weeks days hours minutes seconds nanoseconds/;
+my %css_class_for_unit = map { $_ => "age_$_" } @units;
+</%once>
+
+% if ($time) {
+% 	my $now = DateTime->now;
+% 	my $dur = $time - $now;
+%
+% 	for my $unit (@units) {
+% 		if ($dur->$unit) {
+% 			(my $sing = $unit) =~ s/s$//;
+<span class="<% $css_class_for_unit{$unit} %>"><% $dur->$unit %> <% PL($sing, $dur->$unit) %> ago</span>
+% 			last;
+% 		}
+% 	}
+% }

@@ -1,0 +1,26 @@
+<%args>
+$revs
+</%args>
+
+% for my $rev (@{$revs}) {
+<div class="commit">
+	<div class="commit_summary">
+		<strong>
+		<span class="age"><& /common/format_last_change, time => $rev->{committer_datetime} &></span>
+		<% $rev->{message} %>
+		</strong>
+	</div>
+
+	<div class="commit_links">
+		<ul>
+		<li><& /common/rev_link, rev => $rev->{rev}, action => 'commit'     &></li>
+		<li><& /common/rev_link, rev => $rev->{rev}, action => 'commitdiff' &></li>
+		<li><& /common/rev_link, rev => $rev->{rev}, action => 'snapshot'   &></li>
+		</ul>
+	</div>
+
+	<i><% $rev->{committer_name} || $rev->{committer} %> [<% $rev->{committer_datetime} %>]</i>
+
+	<p class="commit_message"><% $rev->{longmessage} %></p>
+</div>
+% }

@@ -1,0 +1,6 @@
+<%args>
+$project => $c->request->captures->[0]
+$rev
+$action
+</%args>
+<a href="<% $c->uri_for('/project', $project, 'rev', $rev, $action) %>"><% $action %></a>

@@ -1,0 +1,18 @@
+<%args>
+$revs
+</%args>
+
+% if (scalar @{$revs}) {
+<table>
+% 	for my $rev (@{$revs}) {
+	<tr>
+		<td><& /common/format_last_change, time => $rev->{author_datetime} &></td>
+		<td><% $rev->{author_name} || $rev->{author} %></td>
+		<td><% $rev->{message} %></td>
+		<td><& /common/rev_link, rev => $rev->{rev}, action => 'commit'     &></td>
+		<td><& /common/rev_link, rev => $rev->{rev}, action => 'commitdiff' &></td>
+		<td><& /common/rev_link, rev => $rev->{rev}, action => 'snapshot'   &></td>
+	</tr>
+% 	}
+</table>
+% }

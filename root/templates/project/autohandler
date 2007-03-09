@@ -1,0 +1,21 @@
+% my $project_name = $c->request->captures->[0];
+<h1><a href="<% $c->uri_for('/projects') %>">projects</a> / <a href="<% $c->uri_for('/project', $project_name, 'summary') %>"><% $project_name %></a> / <% $c->action->name %></h1>
+
+<%once>
+my @actions = ((map { [$_ => $_] } qw/summary shortlog log/),
+				[snapshot => 'latest snapshot']);
+</%once>
+
+<ul>
+% for my $action (@actions) {
+<li>
+% 	if ($action->[0] eq $c->action->name) {
+<% $action->[1] %>
+% 	} else {
+<a href="<% $c->uri_for('/project', @{ $c->request->captures }[0], $action->[0]) %>"><% $action->[1] %></a>
+% 	}
+</li>
+% }
+</ul>
+
+% $m->call_next;

@@ -7,6 +7,7 @@ use DateTime;
 use Path::Class;
 use Carp qw/croak/;
 use File::Find::Rule;
+use DateTime::Format::Mail;
 use File::Stat::ModeString;
 use List::MoreUtils qw/any/;
 use Scalar::Util qw/blessed/;
@@ -57,7 +58,10 @@ sub get_project_properties {
     my ($self, $dir) = @_;
     my %props;
 
-    $props{description} = $dir->file('description')->slurp;
+    eval {
+        $props{description} = $dir->file('description')->slurp;
+    };
+
     if ($props{description} =~ /^Unnamed repository;/) {
         delete $props{description};
     }
@@ -106,12 +110,13 @@ sub list_projects {
 sub run_cmd {
     my ($self, @args) = @_;
 
+    warn "running git @args";
     open my $fh, '-|', __PACKAGE__->git, @args
         or die "failed to run git command";
-    binmode $fh;
 
     my $output = do { local $/ = undef; <$fh> };
     close $fh;
+    warn "done";
 
     return $output;
 }
@@ -219,45 +224,56 @@ sub diff {
     return $output;
 }
 
-sub parse_rev_list {
-    my ($self, $output) = @_;
-    my @ret;
+{
+    my $formatter = DateTime::Format::Mail->new;
 
-    my @revs = split /\0/, $output;
+    sub parse_rev_list {
+        my ($self, $output) = @_;
+        my @ret;
 
-    for my $rev (split /\0/, $output) {
-        for my $line (split /\n/, $rev, 6) {
-            chomp $line;
-            next unless $line;
+        my @revs = split /\0/, $output;
 
-            if ($self->valid_rev($line)) {
-                push @ret, {rev => $line};
-                next;
-            }
+        for my $rev (split /\0/, $output) {
+            for my $line (split /\n/, $rev, 6) {
+                chomp $line;
+                next unless $line;
 
-            if (my ($key, $value) = $line =~ /^(tree|parent)\s+(.*)$/) {
-                $ret[-1]->{$key} = $value;
-                next;
-            }
-
-            if (my ($key, $value, $epoch, $tz) = $line =~ /^(author|committer)\s+(.*)\s+(\d+)\s+([+-]\d+)$/) {
-                $ret[-1]->{$key} = $value;
-                $ret[-1]->{ $key . "_datetime" } = DateTime->from_epoch(epoch => $epoch);
-                $ret[-1]->{ $key . "_datetime" }->set_time_zone($tz);
-
-                if (my ($name, $email) = $value =~ /^([^<]+)\s+<([^>]+)>$/) {
-                    $ret[-1]->{ $key . "_name"  } = $name;
-                    $ret[-1]->{ $key . "_email" } = $email;
+                if ($self->valid_rev($line)) {
+                    push @ret, {rev => $line};
+                    next;
                 }
+
+                if (my ($key, $value) = $line =~ /^(tree|parent)\s+(.*)$/) {
+                    $ret[-1]->{$key} = $value;
+                    next;
+                }
+
+                if (my ($key, $value, $epoch, $tz) = $line =~ /^(author|committer)\s+(.*)\s+(\d+)\s+([+-]\d+)$/) {
+                    $ret[-1]->{$key} = $value;
+                    eval {
+                        $ret[-1]->{ $key . "_datetime" } = DateTime->from_epoch(epoch => $epoch);
+                        $ret[-1]->{ $key . "_datetime" }->set_time_zone($tz);
+                        $ret[-1]->{ $key . "_datetime" }->set_formatter($formatter);
+                    };
+
+                    if ($@) {
+                        $ret[-1]->{ $key . "_datetime" } = "$epoch $tz";
+                    }
+
+                    if (my ($name, $email) = $value =~ /^([^<]+)\s+<([^>]+)>$/) {
+                        $ret[-1]->{ $key . "_name"  } = $name;
+                        $ret[-1]->{ $key . "_email" } = $email;
+                    }
+                }
+
+                $line =~ s/^\n?\s{4}//;
+                $ret[-1]->{longmessage} = $line;
+                $ret[-1]->{message} = (split /\n/, $line, 2)[0];
             }
-
-            $line =~ s/^\n?\s{4}//;
-            $ret[-1]->{longmessage} = $line;
-            $ret[-1]->{message} = (split /\n/, $line, 2)[0];
         }
-    }
 
-    return @ret;
+        return @ret;
+    }
 }
 
 sub list_revs {
@@ -278,6 +294,14 @@ sub list_revs {
     my @revs = $self->parse_rev_list($output);
 
     return \@revs;
+}
+
+sub rev_info {
+    my ($self, $project, $rev) = @_;
+
+    return unless $self->valid_rev($rev);
+
+    return $self->list_revs($project, rev => $rev, max => 1);
 }
 
 1;

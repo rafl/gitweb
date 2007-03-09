@@ -24,6 +24,7 @@ sub project : Chained PathPart('project') CaptureArgs(1) {
     my ($self, $c, $project) = @_;
 
     my $project_name : Stashed = $project;
+    my $head         : Stashed = 'master';
 }
 
 sub summary : Chained('project') Args(0) {
@@ -39,11 +40,15 @@ sub summary : Chained('project') Args(0) {
 sub shortlog : Chained('project') Args(0) {
     my ($self, $c) = @_;
     my $project_name : Stashed;
+
+    my $revs : Stashed = $c->model('Git')->list_revs($project_name);
 }
 
 sub log : Chained('project') Args(0) {
     my ($self, $c) = @_;
     my $project_name : Stashed;
+
+    my $revs : Stashed = $c->model('Git')->list_revs($project_name);
 }
 
 sub snapshot : Chained('project') Args(0) {
@@ -60,6 +65,9 @@ sub rev : Chained('project') CaptureArgs(1) {
 sub commit : Chained('rev') Args(0) {
     my ($self, $c) = @_;
     my $rev : Stashed;
+    my $project_name : Stashed;
+
+    my $commit : Stashed = @{ $c->model('Git')->rev_info($project_name, $rev) || [] }[0];
 }
 
 sub commitdiff : Chained('rev') Args(0) {
