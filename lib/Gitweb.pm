@@ -16,9 +16,9 @@ use Catalyst::Runtime '5.70';
 use Catalyst qw/
     -Debug
     ConfigLoader
+    StackTrace
     Static::Simple
 /;
-#StackTrace
 
 our $VERSION = '0.01';
 
