@@ -17,10 +17,6 @@ Catalyst Controller.
 
 =cut
 
-=head2 index 
-
-=cut
-
 sub project : Chained PathPart('project') CaptureArgs(1) {
     my ($self, $c, $project) = @_;
 
