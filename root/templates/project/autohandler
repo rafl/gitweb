@@ -12,7 +12,7 @@ my @actions = ((map { [$_ => $_] } qw/summary shortlog log/),
 % 	if ($action->[0] eq $c->action->name) {
 <% $action->[1] %>
 % 	} else {
-<a href="<% $c->uri_for('/project', @{ $c->request->captures }[0], $action->[0]) %>"><% $action->[1] %></a>
+<a href="<% $c->uri_for('/project', $c->request->captures->[0], ($c->action->name =~ /^head/ ? ('head' => $c->request->captures->[1]) : ()), $action->[0]) %>"><% $action->[1] %></a>
 % 	}
 </li>
 % }

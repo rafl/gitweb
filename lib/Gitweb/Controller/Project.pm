@@ -75,6 +75,70 @@ sub snapshot : Chained('project') Args(0) {
     $c->detach('commit_snapshot');
 }
 
+sub head : Chained('project') CaptureArgs(1) {
+    my ($self, $c, $head_arg) = @_;
+
+    my $head : Stashed = $head_arg;
+}
+
+sub head_shortlog : Chained('head') PathPart('shortlog') Args(0) {
+    my ($self, $c) = @_;
+
+    my $head         : Stashed;
+    my $project_name : Stashed;
+
+    my $template : Stashed = '/project/shortlog';
+
+    my $page  : Stashed = $c->request->param( 'page'  ) || 0;
+    my $count : Stashed = $c->request->param( 'count' ) || 30;
+
+    my $revs : Stashed = $c->model('Git')->list_revs($project_name,
+            rev   => $head,
+            skip  => $page * $count,
+            count => $count,
+    );
+}
+
+sub head_log : Chained('head') PathPart('log') Args(0) {
+    my ($self, $c) = @_;
+
+    my $head         : Stashed;
+    my $project_name : Stashed;
+
+    my $template : Stashed = '/project/log';
+
+    my $page  : Stashed = $c->request->param( 'page'  ) || 0;
+    my $count : Stashed = $c->request->param( 'count' ) || 30;
+
+    my $revs : Stashed = $c->model('Git')->list_revs($project_name,
+            rev   => $head,
+            skip  => $page * $count,
+            count => $count,
+    );
+}
+
+sub head_summary : Chained('head') PathPart('summary') Args(0) {
+    my ($self, $c) = @_;
+
+    my $head         : Stashed;
+    my $project_name : Stashed;
+
+    my $template : Stashed = '/project/summary';
+
+    my $page  : Stashed = $c->request->param( 'page'  ) || 0;
+    my $count : Stashed = $c->request->param( 'count' ) || 30;
+
+    my $git = $c->model('Git');
+
+    my $project : Stashed = $git->project_info($project_name);
+    my $heads   : Stashed = $git->get_heads($project_name);
+    my $revs    : Stashed = $c->model('Git')->list_revs($project_name,
+            rev   => $head,
+            skip  => $page * $count,
+            count => $count,
+    );
+}
+
 sub rev : Chained('project') CaptureArgs(1) {
     my ($self, $c, $rev_arg) = @_;
 

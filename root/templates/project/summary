@@ -4,13 +4,13 @@ $revs
 $heads
 </%args>
 
-<%def .rev_link>
+<%def .head_link>
 <%args>
 $project
-$rev
+$head
 $action
 </%args>
-<a href="<% $c->uri_for('/project', $project, 'rev', $rev, $action) %>"><% $action %></a>
+<a href="<% $c->uri_for('/project', $project, 'head', $head, $action) %>"><% $action %></a>
 </%def>
 
 <dl>
@@ -31,8 +31,8 @@ $action
 	<tr>
 		<td><& /common/format_last_change, time => $head->{last_change} &></td>
 		<td><% $head->{name} %></td>
-		<td><& /common/rev_link, rev => $head->{rev}, action => 'shortlog' &></td>
-		<td><& /common/rev_link, rev => $head->{rev}, action => 'log'      &></td>
+		<td><& .head_link, project => $project->{name}, head => $head->{name}, action => 'shortlog' &></td>
+		<td><& .head_link, project => $project->{name}, head => $head->{name}, action => 'log'      &></td>
 	</tr>
 % }
 </table>

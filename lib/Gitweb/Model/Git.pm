@@ -284,7 +284,7 @@ sub list_revs {
             (defined $args{ skip  } ? "--skip=$args{skip}"     : ()),
             $args{rev},
             '--',
-            ($args{file} || ())
+            ($args{file} || ()),
     );
     return unless $output;
 
