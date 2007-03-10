@@ -111,6 +111,7 @@ sub run_cmd {
 
     open my $fh, '-|', __PACKAGE__->git, @args
         or die "failed to run git command";
+    binmode $fh, ':encoding(UTF-8)';
 
     my $output = do { local $/ = undef; <$fh> };
     close $fh;
