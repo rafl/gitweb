@@ -109,13 +109,11 @@ sub list_projects {
 sub run_cmd {
     my ($self, @args) = @_;
 
-    warn "running git @args";
     open my $fh, '-|', __PACKAGE__->git, @args
         or die "failed to run git command";
 
     my $output = do { local $/ = undef; <$fh> };
     close $fh;
-    warn "done";
 
     return $output;
 }
@@ -278,7 +276,6 @@ sub diff {
 sub list_revs {
     my ($self, $project, %args) = @_;
 
-    Data::Dump::dump(\@_);
     $args{rev} ||= $self->get_head_hash($project);
 
     my $output = $self->run_cmd_in($project, 'rev-list',
