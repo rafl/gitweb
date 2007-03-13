@@ -2,15 +2,6 @@
 $projects
 </%args>
 
-<%def .project_link>
-<%args>
-$project
-$action
-$desc => $action
-</%args>
-<a href="<% $c->uri_for('/project', $project, $action) %>"><% $desc %></a>
-</%def>
-
 % if (scalar @{$projects}) {
 <table>
 <tr>
@@ -21,14 +12,14 @@ $desc => $action
 </tr>
 % 	for my $project (@{ $projects }) {
 <tr>
-	<td><& .project_link, project => $project->{name}, action => 'summary', desc => $project->{name} &></td>
+	<td><& /common/project_link, project => $project->{name}, action => 'summary', desc => $project->{name} &></td>
 	<td><% $project->{ description } %></td>
 	<td><% $project->{ owner       } %></td>
 	<td><& /common/format_last_change, time => $project->{ last_change } &></td>
-	<td><& .project_link, project => $project->{name}, action => 'summary'  &></td>
-	<td><& .project_link, project => $project->{name}, action => 'shortlog' &></td>
-	<td><& .project_link, project => $project->{name}, action => 'log'      &></td>
-	<td><& .project_link, project => $project->{name}, action => 'snapshot', desc => 'latest snapshot' &></td>
+	<td><& /common/project_link, project => $project->{name}, action => 'summary'  &></td>
+	<td><& /common/project_link, project => $project->{name}, action => 'shortlog' &></td>
+	<td><& /common/project_link, project => $project->{name}, action => 'log'      &></td>
+	<td><& /common/project_link, project => $project->{name}, action => 'snapshot', desc => 'latest snapshot' &></td>
 </tr>
 % 	}
 </table>
