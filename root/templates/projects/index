@@ -13,7 +13,7 @@ $projects
 % 	for my $project (@{ $projects }) {
 <tr>
 	<td><& /common/project_link, project => $project->{name}, action => 'summary', desc => $project->{name} &></td>
-	<td><% $project->{ description } %></td>
+	<td><% $project->{ description } || 'none' %></td>
 	<td><% $project->{ owner       } %></td>
 	<td><& /common/format_last_change, time => $project->{ last_change } &></td>
 	<td><& /common/project_link, project => $project->{name}, action => 'summary'  &></td>
