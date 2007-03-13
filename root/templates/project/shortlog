@@ -3,10 +3,10 @@ $revs
 </%args>
 
 <%def .shortlog_nav>
+<div class="page_nav">
 % my $page = $c->stash->{page};
-<ul>
-<li><a href="<% $c->request->uri_with({ page => 0 }) %>">HEAD</a></li>
-<li>
+<a href="<% $c->request->uri_with({ page => 0 }) %>">HEAD</a>
+ ⋅ 
 % if ($page > 0) {
 <a href="<% $c->request->uri_with({ page => $page - 1 }) %>">
 % }
@@ -14,22 +14,34 @@ prev
 % if ($page > 0) {
 </a>
 % }
-</li>
-<li><a href="<% $c->request->uri_with({ page => $page + 1 }) %>">next</a></li>
-</ul>
+ ⋅ <a href="<% $c->request->uri_with({ page => $page + 1 }) %>">next</a>
+</div>
 </%def>
 
 % if (scalar @{$revs}) {
 <& .shortlog_nav &>
-<table>
-% 	for my $rev (@{$revs}) {
-	<tr>
-		<td><& /common/format_last_change, time => $rev->{author_datetime} &></td>
-		<td><% $rev->{author_name} || $rev->{author} %></td>
-		<td><% $rev->{message} %></td>
-		<td><& /common/rev_link, rev => $rev->{rev}, action => 'commit'     &></td>
-		<td><& /common/rev_link, rev => $rev->{rev}, action => 'commitdiff' &></td>
-		<td><& /common/rev_link, rev => $rev->{rev}, action => 'snapshot'   &></td>
+<table cellspacing="0">
+%  	for my $i (0 .. $#{$revs}) {
+% 		my $rev = $revs->[$i];
+	<tr class="<% ($i % 2) ? 'dark' : 'light' %>">
+		<td>
+			<& /common/format_last_change, time => $rev->{author_datetime} &>
+		</td>
+		<td>
+			<i><% $rev->{author_name} || $rev->{author} %></i>
+		</td>
+		<td>
+			<b><% $rev->{message} %><b>
+		</td>
+		<td class="link">
+			<& /common/rev_link, rev => $rev->{rev}, action => 'commit'     &>
+		</td>
+		<td class="link">
+			<& /common/rev_link, rev => $rev->{rev}, action => 'commitdiff' &>
+		</td>
+		<td class="link">
+			<& /common/rev_link, rev => $rev->{rev}, action => 'snapshot'   &>
+		</td>
 	</tr>
 % 	}
 </table>

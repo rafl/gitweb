@@ -13,22 +13,26 @@ $action
 <a href="<% $c->uri_for('/project', $project, 'head', $head, $action) %>"><% $action %></a>
 </%def>
 
-<dl>
-% for my $prop (qw/description owner last_change/) { #TODO: url
-	<dt><% $prop %></dt>
-	<dd><% $project->{$prop} || 'none' %></dd>
-% }
-</dl>
+<div class="title">&nbsp;</div>
 
-<h2>shortlog</h2>
+<table>
+% for my $prop (qw/description owner last_change/) { #TODO: url
+	<tr>
+		<td><% $prop %></td>
+		<td><% $project->{$prop} || 'none' %></td>
+	</tr>
+% }
+</table>
+
+<div class="title">shortlog</div>
 
 <& /project/shortlog, revs => $revs &>
 
-<h2>heads</h2>
+<div class="title">heads</div>
 
 <table>
 % for my $head (@{$heads}) {
-	<tr>
+	<tr class="light">
 		<td><& /common/format_last_change, time => $head->{last_change} &></td>
 		<td><% $head->{name} %></td>
 		<td><& .head_link, project => $project->{name}, head => $head->{name}, action => 'shortlog' &></td>
