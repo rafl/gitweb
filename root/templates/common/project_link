@@ -1,0 +1,6 @@
+<%args>
+$project
+$action
+$desc => $action
+</%args>
+<a class="project_link" href="<% $c->uri_for('/project', $project, $action) %>"><% $desc %></a>
